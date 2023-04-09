@@ -2,14 +2,13 @@
 
 usage_info () {
 	echo ""
-	echo "Switch the current cards.xml and tokens.xml file in the cockatrice folder"
+	echo "Switch the current card files in the cockatrice folder"
 	echo "Usage: cockswitch <Format>	Switch the current card files to format"
-	echo "       cockswitch -s <Format>	Saves the current card files as format"
 	echo ""
 	echo "Card files for each format should be stored in storage/<format> inside the Cockatrice folder"
 	echo ""
 	echo "Options:"
-	echo "-s FORMAT	instead saves the current card files into the storage_path"
+	echo "-s FORMAT	saves the current cards as the format"
   	echo "-n FORMAT	creates a new format"
   	echo "-d FORMAT	deletes the format"
 }
@@ -27,20 +26,23 @@ token_file='tokens.xml'
 # optargs
 #================================
 
-s=false
-n=false
-d=false
+do_switch=true
+do_store=false
+do_new=false
+do_delete=false
 
 process_optargs () {
   	local OPTIND
   	while getopts "snd" option; do
   	 	case $option in
    	   		s)
-   	     		s=true ;;
+   	     		do_store=true
+   	     		do_switch=false ;;
    	   		n)
-   	     		n=true ;;
+   	     		do_new=true
+   	     		do_switch=false ;;
    	   		d)
-   	     		d=true ;;
+   	     		do_delete=true ;;
    	  		\?)
    	     		echo "Invalid argument: ${OPTARG}"
    	     		exit 1 ;;
@@ -58,19 +60,29 @@ process_optargs () {
  	# go to cockatrice folder
  	cd "$trice_path"
 
- 	# run appropriate program
- 	if [ $s = 'true' ]; then
- 	 	cockstore "${@}"
- 	else
-  		cockswitch "${@}"
-  	fi
+	# run appropriate command
+ 	if [ $do_new = 'true' ]; then make_format "${@}"; fi
+ 	if [ $do_store = 'true' ]; then store_format "${@}"; fi
+ 	if [ $do_switch = 'true' ]; then switch_format "${@}"; fi
+ 	if [ $do_delete = 'true' ]; then delete_format "${@}"; fi
 }
 
 #================================
-# Cockswitch
+# Create format
 #================================
 
-cockswitch () {
+make_format () {
+	local format="$1"
+	local destpath="$storage_path/$format"
+
+	mkdir "$destpath"
+}
+
+#================================
+# Switch format
+#================================
+
+switch_format () {
 	local format="$1"
 	local sourcepath="$storage_path/$format"
 
@@ -78,14 +90,25 @@ cockswitch () {
 }
 
 #================================
-# Cockstore
+# Store format
 #================================
 
-cockstore () {
+store_format () {
 	local format="$1"
 	local destpath="$storage_path/$format"
 
 	cp -f "./$card_file" "./$token_file" "$destpath"
+}
+
+#================================
+# Delete format
+#================================
+
+delete_format () {
+	local format="$1"
+	local destpath="$storage_path/$format"
+
+	rm -r "$destpath"
 }
 
 
