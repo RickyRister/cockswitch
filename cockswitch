@@ -2,15 +2,15 @@
 
 usage_info () {
 	echo ""
-	echo "Switch the current card files in the cockatrice folder"
-	echo "Usage: cockswitch <Format>	Switch the current card files to format"
+	echo "Switch between different formats' cards on Cockatrice"
+	echo "Usage: cockswitch <Format>"
 	echo ""
-	echo "Card files for each format should be stored in storage/<format> inside the Cockatrice folder"
+	echo "Files for each format should be stored in formats/<format> inside the Cockatrice folder"
 	echo ""
 	echo "Options:"
-	echo "-s FORMAT	saves the current cards as the format"
-  	echo "-n FORMAT	creates a new format"
-  	echo "-d FORMAT	deletes the format"
+	echo "-s FORMAT	overwrite format with currently loaded card files"
+  	echo "-n FORMAT	create a new format"
+  	echo "-d FORMAT	delete the format"
 }
 
 #================================
@@ -18,7 +18,7 @@ usage_info () {
 #================================
 
 trice_path="$HOME/Library/Application Support/Cockatrice/Cockatrice"
-storage_path="$trice_path/storage"
+formats_path="$trice_path/formats"
 card_file='cards.xml'
 token_file='tokens.xml'
 
@@ -60,7 +60,7 @@ process_optargs () {
  	# go to cockatrice folder
  	cd "$trice_path"
 
-	# run appropriate command
+	# run the appropriate command
  	if [ $do_new = 'true' ]; then make_format "${@}"; fi
  	if [ $do_store = 'true' ]; then store_format "${@}"; fi
  	if [ $do_switch = 'true' ]; then switch_format "${@}"; fi
@@ -73,7 +73,7 @@ process_optargs () {
 
 make_format () {
 	local format="$1"
-	local destpath="$storage_path/$format"
+	local destpath="$formats_path/$format"
 
 	mkdir "$destpath"
 }
@@ -84,7 +84,7 @@ make_format () {
 
 switch_format () {
 	local format="$1"
-	local sourcepath="$storage_path/$format"
+	local sourcepath="$formats_path/$format"
 
 	cp -f "$sourcepath/$card_file" "$sourcepath/$token_file" ./
 }
@@ -95,7 +95,7 @@ switch_format () {
 
 store_format () {
 	local format="$1"
-	local destpath="$storage_path/$format"
+	local destpath="$formats_path/$format"
 
 	cp -f "./$card_file" "./$token_file" "$destpath"
 }
@@ -106,7 +106,7 @@ store_format () {
 
 delete_format () {
 	local format="$1"
-	local destpath="$storage_path/$format"
+	local destpath="$formats_path/$format"
 
 	rm -r "$destpath"
 }
