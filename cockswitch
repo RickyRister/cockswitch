@@ -1,6 +1,13 @@
 #!/bin/bash
 
 usage_info () {
+	echo "Switch between different formats' cards on Cockatrice"
+	echo "Usage: cockswitch [options] <Format>"
+	echo ""
+	echo "Run with -h flag for more info"
+}
+
+full_usage_info () {
 	echo ""
 	echo "Switch between different formats' cards on Cockatrice"
 	echo "Usage: cockswitch [options] <Format>"
@@ -9,10 +16,12 @@ usage_info () {
 	echo "Files for each format should be stored in formats/<format> inside the Cockatrice folder"
 	echo ""
 	echo "Options:"
-	echo "-u	save currently loaded card files to format"
   	echo "-n	create a new format"
-  	echo "-d	delete the format"
+	echo "-u	save currently loaded card files to format"
+  	echo "-w	edit the format's description"
+  	echo "-i	print the format's description"
   	echo "-s	switch to the format afterwards"
+  	echo "-d	delete the format"
   	echo "-l	list all saved formats"
 }
 
@@ -24,6 +33,7 @@ trice_path="$HOME/Library/Application Support/Cockatrice/Cockatrice"
 formats_path="$trice_path/formats"
 card_file='cards.xml'
 token_file='tokens.xml'
+description_file='description.txt'
 
 #================================
 # optargs
@@ -33,29 +43,42 @@ no_opts=true
 allow_no_args=false
 require_args=false
 always_switch=false
-do_store=false
 do_new=false
+do_store=false
+do_write=false
+do_info=false
 do_delete=false
 do_list=false
 
 process_optargs () {
   	local OPTIND
-  	while getopts "undsl" option; do
+  	while getopts "hnuwisdl" option; do
   	 	case $option in
-   	   		u)
-   	     		do_store=true
-   	     		no_opts=false
-   	     		require_args=true ;;
+   	   		h)
+   	     		full_usage_info
+   	     		exit 1 ;;
    	   		n)
    	     		do_new=true
    	     		no_opts=false
    	     		require_args=true ;;
-   	   		d)
-   	     		do_delete=true
+   	   		u)
+   	     		do_store=true
+   	     		no_opts=false
+   	     		require_args=true ;;
+   	   		w)
+   	     		do_write=true 
+   	     		no_opts=false
+   	     		require_args=true ;;
+   	   		i)
+   	     		do_info=true 
    	     		no_opts=false
    	     		require_args=true ;;
    	   		s)
    	     		always_switch=true 
+   	     		no_opts=false
+   	     		require_args=true ;;
+   	   		d)
+   	     		do_delete=true
    	     		no_opts=false
    	     		require_args=true ;;
    	   		l)
@@ -92,6 +115,8 @@ process_optargs () {
 	# run the appropriate command
  	if [ $do_new = 'true' ]; then make_format "${@}"; fi
  	if [ $do_store = 'true' ]; then store_format "${@}"; fi
+ 	if [ $do_write = 'true' ]; then write_format "${@}"; fi
+ 	if [ $do_info = 'true' ]; then info_format "${@}"; fi
  	if [ $do_switch = 'true' ]; then switch_format "${@}"; fi
  	if [ $do_delete = 'true' ]; then delete_format "${@}"; fi
  	if [ $do_list = 'true' ]; then list_formats; fi
@@ -105,7 +130,7 @@ make_format () {
 	local format="$1"
 	local destpath="$formats_path/$format"
 
-	mkdir "$destpath" && { 
+	mkdir "$destpath" 2> /dev/null && { 
 		echo "Created format $format" 
 	} || {
 		echo "Error: format $format already exists"
@@ -125,7 +150,7 @@ switch_format () {
 		return
 	fi
 
-	cp -f "$sourcepath/$card_file" "$sourcepath/$token_file" ./ && {
+	cp -f "$sourcepath/$card_file" "$sourcepath/$token_file" ./ 2> /dev/null && {
 		echo "Switched to $format"
 	} || {
 		echo "Error: format $format is missing card files"
@@ -147,6 +172,42 @@ store_format () {
 
 	cp -f "./$card_file" "./$token_file" "$destpath" &&
 	echo "Updated $format with current card files"
+}
+
+#================================
+# Write format description
+#================================
+
+write_format () {
+	local format="$1"
+	local destpath="$formats_path/$format"
+
+	if [ ! -d "$destpath" ]; then
+		echo "Error: format $format does not exist"
+		return
+	fi
+
+	"${EDITOR:-nano}" "$destpath/$description_file" && {
+		echo "Edited description for $format"
+	}
+}
+
+#================================
+# Read format description
+#================================
+
+info_format () {
+	local format="$1"
+	local destpath="$formats_path/$format"
+
+	if [ ! -d "$destpath" ]; then
+		echo "Error: format $format does not exist"
+		return
+	fi
+
+	cat "$destpath/$description_file" 2> /dev/null || {
+		echo "Error: No description found for $format. Write description with -w"
+	}
 }
 
 #================================
