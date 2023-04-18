@@ -3,14 +3,17 @@
 usage_info () {
 	echo ""
 	echo "Switch between different formats' cards on Cockatrice"
-	echo "Usage: cockswitch <Format>"
+	echo "Usage: cockswitch [options] <Format>"
 	echo ""
+	echo "Running with no options is equivalent to running with -s"
 	echo "Files for each format should be stored in formats/<format> inside the Cockatrice folder"
 	echo ""
 	echo "Options:"
-	echo "-s FORMAT	overwrite format with currently loaded card files"
-  	echo "-n FORMAT	create a new format"
-  	echo "-d FORMAT	delete the format"
+	echo "-u	save currently loaded card files to format"
+  	echo "-n	create a new format"
+  	echo "-d	delete the format"
+  	echo "-s	switch to the format afterwards"
+  	echo "-l	list all saved formats"
 }
 
 #================================
@@ -26,25 +29,40 @@ token_file='tokens.xml'
 # optargs
 #================================
 
-do_switch=true
+no_opts=true
+allow_no_args=false
+require_args=false
+always_switch=false
 do_store=false
 do_new=false
 do_delete=false
+do_list=false
 
 process_optargs () {
   	local OPTIND
-  	while getopts "snd" option; do
+  	while getopts "undsl" option; do
   	 	case $option in
-   	   		s)
+   	   		u)
    	     		do_store=true
-   	     		do_switch=false ;;
+   	     		no_opts=false
+   	     		require_args=true ;;
    	   		n)
    	     		do_new=true
-   	     		do_switch=false ;;
+   	     		no_opts=false
+   	     		require_args=true ;;
    	   		d)
-   	     		do_delete=true ;;
+   	     		do_delete=true
+   	     		no_opts=false
+   	     		require_args=true ;;
+   	   		s)
+   	     		always_switch=true 
+   	     		no_opts=false
+   	     		require_args=true ;;
+   	   		l)
+   	     		do_list=true 
+   	     		no_opts=false
+   	     		allow_no_args=true ;;
    	  		\?)
-   	     		echo "Invalid argument: ${OPTARG}"
    	     		exit 1 ;;
    		esac
   	done
@@ -52,10 +70,21 @@ process_optargs () {
   	shift $((OPTIND-1))
 
   	# validate args
-  	if [ $# -ne 1 ]; then 
+  	local arg_count=1
+  	if [ $allow_no_args = 'true' ] && [ $require_args = 'false' ]; then
+  		arg_count=0
+  	fi
+
+  	if [ $# -ne $arg_count ]; then 
 		usage_info 
 		exit 1
  	fi
+
+ 	# determine if switching is needed
+ 	local do_switch=false
+	if [ $no_opts = 'true' ] || [ $always_switch = 'true' ]; then
+  		do_switch=true
+  	fi
 
  	# go to cockatrice folder
  	cd "$trice_path"
@@ -65,6 +94,7 @@ process_optargs () {
  	if [ $do_store = 'true' ]; then store_format "${@}"; fi
  	if [ $do_switch = 'true' ]; then switch_format "${@}"; fi
  	if [ $do_delete = 'true' ]; then delete_format "${@}"; fi
+ 	if [ $do_list = 'true' ]; then list_formats; fi
 }
 
 #================================
@@ -75,7 +105,11 @@ make_format () {
 	local format="$1"
 	local destpath="$formats_path/$format"
 
-	mkdir "$destpath"
+	mkdir "$destpath" && { 
+		echo "Created format $format" 
+	} || {
+		echo "Error: format $format already exists"
+	}
 }
 
 #================================
@@ -86,7 +120,16 @@ switch_format () {
 	local format="$1"
 	local sourcepath="$formats_path/$format"
 
-	cp -f "$sourcepath/$card_file" "$sourcepath/$token_file" ./
+	if [ ! -d "$sourcepath" ]; then
+		echo "Error: format $format does not exist"
+		return
+	fi
+
+	cp -f "$sourcepath/$card_file" "$sourcepath/$token_file" ./ && {
+		echo "Switched to $format"
+	} || {
+		echo "Error: format $format is missing card files"
+	}
 }
 
 #================================
@@ -97,7 +140,13 @@ store_format () {
 	local format="$1"
 	local destpath="$formats_path/$format"
 
-	cp -f "./$card_file" "./$token_file" "$destpath"
+	if [ ! -d "$destpath" ]; then
+		echo "Error: format $format does not exist"
+		return
+	fi
+
+	cp -f "./$card_file" "./$token_file" "$destpath" &&
+	echo "Updated $format with current card files"
 }
 
 #================================
@@ -108,9 +157,22 @@ delete_format () {
 	local format="$1"
 	local destpath="$formats_path/$format"
 
-	rm -r "$destpath"
+	if [ ! -d "$destpath" ]; then
+		echo "Error: format $format does not exist"
+		return
+	fi
+
+	rm -r "$destpath" &&
+	echo "Deleted format $format"
 }
 
+#================================
+# List formats
+#================================
+
+list_formats () {
+	ls "$formats_path"
+}
 
 #================================
 # Actual entrance point
