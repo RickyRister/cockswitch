@@ -16,10 +16,11 @@ full_usage_info () {
 	echo "Files for each format should be stored in formats/<format> inside the Cockatrice folder"
 	echo ""
 	echo "Options:"
+	echo "-h	prints this help menu and exits"
   	echo "-n	create a new format"
 	echo "-u	save currently loaded card files to format"
-  	echo "-w	edit the format's description"
-  	echo "-i	print the format's description"
+  	echo "-w	edit the format's notes"
+  	echo "-p	print the format's notes"
   	echo "-s	switch to the format afterwards"
   	echo "-d	delete the format"
   	echo "-l	list all saved formats"
@@ -33,7 +34,7 @@ trice_path="$HOME/Library/Application Support/Cockatrice/Cockatrice"
 formats_path="$trice_path/formats"
 card_file='cards.xml'
 token_file='tokens.xml'
-description_file='description.txt'
+notes_file='notes.txt'
 
 #================================
 # optargs
@@ -52,7 +53,7 @@ do_list=false
 
 process_optargs () {
   	local OPTIND
-  	while getopts "hnuwisdl" option; do
+  	while getopts "hnuwpsdl" option; do
   	 	case $option in
    	   		h)
    	     		full_usage_info
@@ -69,7 +70,7 @@ process_optargs () {
    	     		do_write=true 
    	     		no_opts=false
    	     		require_args=true ;;
-   	   		i)
+   	   		p)
    	     		do_info=true 
    	     		no_opts=false
    	     		require_args=true ;;
@@ -175,7 +176,7 @@ store_format () {
 }
 
 #================================
-# Write format description
+# Write format notes
 #================================
 
 write_format () {
@@ -187,13 +188,13 @@ write_format () {
 		return
 	fi
 
-	"${EDITOR:-nano}" "$destpath/$description_file" && {
-		echo "Edited description for $format"
+	"${EDITOR:-nano}" "$destpath/$notes_file" && {
+		echo "Edited notes for $format"
 	}
 }
 
 #================================
-# Read format description
+# Read format notes
 #================================
 
 info_format () {
@@ -205,8 +206,8 @@ info_format () {
 		return
 	fi
 
-	cat "$destpath/$description_file" 2> /dev/null || {
-		echo "Error: No description found for $format. Write description with -w"
+	cat "$destpath/$notes_file" 2> /dev/null || {
+		echo "Error: No notes found for $format. Write notes with -w"
 	}
 }
 
