@@ -31,12 +31,20 @@ full_usage_info () {
 # Constants
 #================================
 
+#Mac Default
 trice_path="$HOME/Library/Application Support/Cockatrice/Cockatrice"
+#Linux Default (At least on Debian-based systems, probably most others)
+#trice_path="$HOME/.local/share/Cockatrice/Cockatrice"
+
 formats_path="$trice_path/formats"
 decklist_path="$trice_path/decks"
+settings_path="$trice_path/settings"
 card_file='cards.xml'
 token_file='tokens.xml'
 notes_file='notes.txt'
+global_file='global.ini'
+downloads_file='downloads.ini'
+filter_file='gamefilters.ini'
 
 #================================
 # optargs
@@ -161,6 +169,11 @@ switch_format () {
 
 	cp -f "$sourcepath/$card_file" "$sourcepath/$token_file" ./ 2> /dev/null && {
 		echo "Switched to $format"
+		cp -f "$sourcepath/$global_file" "$sourcepath/$downloads_file" "$sourcepath/$filter_file" "$settings_path/" 2> /dev/null && {
+			echo "Settings files updated."
+		} || {
+			echo "Warning: Settings files for $format are missing."
+		}
 	} || {
 		echo "Error: format $format is missing card files"
 	}
@@ -180,6 +193,7 @@ store_format () {
 	fi
 
 	cp -f "./$card_file" "./$token_file" "$destpath" &&
+	cp -f "$settings_path/$global_file" "$settings_path/$downloads_file" "$settings_path/$filter_file" "$destpath" &&
 	echo "Updated $format with current card files"
 }
 
