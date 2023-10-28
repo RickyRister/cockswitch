@@ -20,7 +20,7 @@ full_usage_info () {
   	echo "-n	create a new format"
 	echo "-u	save currently loaded card files to format"
   	echo "-w	edit the format's notes"
-  	echo "-p	print the format's notes"
+  	echo "-t	save current settings files to format"
   	echo "-o	open the decklist folder for that format"
   	echo "-s	switch to the format afterwards"
   	echo "-d	delete the format"
@@ -55,7 +55,8 @@ allow_no_args=false
 require_args=false
 always_switch=false
 do_new=false
-do_store=false
+do_store_cards=false
+do_store_settings=false
 do_write=false
 do_info=false
 do_open=false 
@@ -64,7 +65,7 @@ do_list=false
 
 process_optargs () {
   	local OPTIND
-  	while getopts "hnuwposdl" option; do
+  	while getopts "hnutwposdl" option; do
   	 	case $option in
    	   		h)
    	     		full_usage_info
@@ -74,7 +75,11 @@ process_optargs () {
    	     		no_opts=false
    	     		require_args=true ;;
    	   		u)
-   	     		do_store=true
+   	     		do_store_cards=true
+   	     		no_opts=false
+   	     		require_args=true ;;
+   	     	t)
+   	     		do_store_settings=true
    	     		no_opts=false
    	     		require_args=true ;;
    	   		w)
@@ -130,7 +135,8 @@ process_optargs () {
 
 	# run the appropriate command
  	if [ $do_new = 'true' ]; then make_format "${@}"; fi
- 	if [ $do_store = 'true' ]; then store_format "${@}"; fi
+ 	if [ $do_store_cards = 'true' ]; then store_cards "${@}"; fi
+ 	if [ $do_store_settings = 'true' ]; then store_settings "${@}"; fi
  	if [ $do_write = 'true' ]; then write_format "${@}"; fi
  	if [ $do_info = 'true' ]; then info_format "${@}"; fi
  	if [ $do_open = 'true' ]; then open_format "${@}"; fi
@@ -168,11 +174,11 @@ switch_format () {
 	fi
 
 	cp -f "$sourcepath/$card_file" "$sourcepath/$token_file" ./ 2> /dev/null && {
-		echo "Switched to $format"
+		echo "Switched to $format (card files)"
 		cp -f "$sourcepath/$global_file" "$sourcepath/$downloads_file" "$sourcepath/$filter_file" "$settings_path/" 2> /dev/null && {
-			echo "Settings files updated."
+			echo "Switched to $format (settings files)"
 		} || {
-			echo "Warning: Settings files for $format are missing."
+			echo "Format $format does not have saved settings files."
 		}
 	} || {
 		echo "Error: format $format is missing card files"
@@ -180,10 +186,10 @@ switch_format () {
 }
 
 #================================
-# Store format
+# Store cards for format
 #================================
 
-store_format () {
+store_cards () {
 	local format="$1"
 	local destpath="$formats_path/$format"
 
@@ -193,8 +199,24 @@ store_format () {
 	fi
 
 	cp -f "./$card_file" "./$token_file" "$destpath" &&
-	cp -f "$settings_path/$global_file" "$settings_path/$downloads_file" "$settings_path/$filter_file" "$destpath" &&
 	echo "Updated $format with current card files"
+}
+
+#================================
+# Store settings for format
+#================================
+
+store_settings () {
+	local format="$1"
+	local destpath="$formats_path/$format"
+
+	if [ ! -d "$destpath" ]; then
+		echo "Error: format $format does not exist"
+		return
+	fi
+
+	cp -f "$settings_path/$global_file" "$settings_path/$downloads_file" "$settings_path/$filter_file" "$destpath" &&
+	echo "Updated $format with current settings files"
 }
 
 #================================
