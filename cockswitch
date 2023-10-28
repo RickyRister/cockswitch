@@ -21,6 +21,7 @@ full_usage_info () {
 	echo "-u	save currently loaded card files to format"
   	echo "-w	edit the format's notes"
   	echo "-p	print the format's notes"
+  	echo "-o	open the decklist folder for that format"
   	echo "-s	switch to the format afterwards"
   	echo "-d	delete the format"
   	echo "-l	list all saved formats"
@@ -32,6 +33,7 @@ full_usage_info () {
 
 trice_path="$HOME/Library/Application Support/Cockatrice/Cockatrice"
 formats_path="$trice_path/formats"
+decklist_path="$trice_path/decks"
 card_file='cards.xml'
 token_file='tokens.xml'
 notes_file='notes.txt'
@@ -48,12 +50,13 @@ do_new=false
 do_store=false
 do_write=false
 do_info=false
+do_open=false 
 do_delete=false
 do_list=false
 
 process_optargs () {
   	local OPTIND
-  	while getopts "hnuwpsdl" option; do
+  	while getopts "hnuwposdl" option; do
   	 	case $option in
    	   		h)
    	     		full_usage_info
@@ -72,6 +75,10 @@ process_optargs () {
    	     		require_args=true ;;
    	   		p)
    	     		do_info=true 
+   	     		no_opts=false
+   	     		require_args=true ;;
+   	   		o)
+   	     		do_open=true 
    	     		no_opts=false
    	     		require_args=true ;;
    	   		s)
@@ -118,6 +125,7 @@ process_optargs () {
  	if [ $do_store = 'true' ]; then store_format "${@}"; fi
  	if [ $do_write = 'true' ]; then write_format "${@}"; fi
  	if [ $do_info = 'true' ]; then info_format "${@}"; fi
+ 	if [ $do_open = 'true' ]; then open_format "${@}"; fi
  	if [ $do_switch = 'true' ]; then switch_format "${@}"; fi
  	if [ $do_delete = 'true' ]; then delete_format "${@}"; fi
  	if [ $do_list = 'true' ]; then list_formats; fi
@@ -188,7 +196,7 @@ write_format () {
 		return
 	fi
 
-	"${EDITOR:-nano}" "$destpath/$notes_file" && {
+	"${EDITOR}" "$destpath/$notes_file" && {
 		echo "Edited notes for $format"
 	}
 }
@@ -209,6 +217,22 @@ info_format () {
 	cat "$destpath/$notes_file" 2> /dev/null || {
 		echo "Error: No notes found for $format. Write notes with -w"
 	}
+}
+
+#================================
+# Open format decklist folder
+#================================
+
+open_format () {
+	local format="$1"
+	local destpath="$decklist_path/$format"
+
+	if [ ! -d "$destpath" ]; then
+		echo "Decklist folder for $format does not exist; created new folder"
+		mkdir "$destpath"
+	fi
+
+	open "$destpath"
 }
 
 #================================
