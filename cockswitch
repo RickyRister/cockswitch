@@ -12,7 +12,7 @@ full_usage_info () {
 	echo "Switch between different formats' cards on Cockatrice"
 	echo "Usage: cockswitch [options] <Format>"
 	echo ""
-	echo "Running with no options will switch to the format"
+	echo "Running with no options will switch both cards and settings to the format (equivalent to running with -cs)"
 	echo "Files for each format should be stored in formats/<format> inside the Cockatrice folder"
 	echo ""
 	echo "Options:"
@@ -20,6 +20,8 @@ full_usage_info () {
   	echo "-n	create a new format"
 	echo "-u	save currently loaded card files to format"
 	echo "-t	save current settings files to format"
+	echo "-c	switch card files to the format's"
+	echo "-s	switch settings to the format's"
   	echo "-w	edit the format's notes"
   	echo "-p	print the format's notes"
   	echo "-o	open the decklist folder for that format"
@@ -56,6 +58,8 @@ require_args=false
 do_new=false
 do_store_cards=false
 do_store_settings=false
+do_switch_cards=false
+do_switch_settings=false
 do_write=false
 do_info=false
 do_open=false 
@@ -64,7 +68,7 @@ do_list=false
 
 process_optargs () {
   	local OPTIND
-  	while getopts "hnutwpodl" option; do
+  	while getopts "hnutcswpodl" option; do
   	 	case $option in
    	   		h)
    	     		full_usage_info
@@ -79,6 +83,14 @@ process_optargs () {
    	     		require_args=true ;;
    	     	t)
    	     		do_store_settings=true
+   	     		no_opts=false
+   	     		require_args=true ;;
+   	     	c)
+   	     		do_switch_cards=true
+   	     		no_opts=false
+   	     		require_args=true ;;
+   	     	s)
+   	     		do_switch_settings=true
    	     		no_opts=false
    	     		require_args=true ;;
    	   		w)
@@ -120,9 +132,9 @@ process_optargs () {
  	fi
 
  	# determine if switching is needed
- 	local do_switch=false
 	if [ $no_opts = 'true' ] ; then
-  		do_switch=true
+		do_switch_cards=true
+		do_switch_settings=true
   	fi
 
  	# go to cockatrice folder
@@ -135,7 +147,8 @@ process_optargs () {
  	if [ $do_write = 'true' ]; then write_format "${@}"; fi
  	if [ $do_info = 'true' ]; then info_format "${@}"; fi
  	if [ $do_open = 'true' ]; then open_format "${@}"; fi
- 	if [ $do_switch = 'true' ]; then switch_format "${@}"; fi
+ 	if [ $do_switch_cards = 'true' ]; then switch_cards "${@}"; fi
+ 	if [ $do_switch_settings = 'true' ]; then switch_settings "${@}"; fi
  	if [ $do_delete = 'true' ]; then delete_format "${@}"; fi
  	if [ $do_list = 'true' ]; then list_formats; fi
 }
@@ -156,10 +169,10 @@ make_format () {
 }
 
 #================================
-# Switch format
+# Switch cards
 #================================
 
-switch_format () {
+switch_cards () {
 	local format="$1"
 	local sourcepath="$formats_path/$format"
 
@@ -170,14 +183,29 @@ switch_format () {
 
 	cp -f "$sourcepath/$card_file" "$sourcepath/$token_file" ./ 2> /dev/null && {
 		echo "Switched to $format (card files)"
-		cp -f "$sourcepath/$global_file" "$sourcepath/$downloads_file" "$sourcepath/$filter_file" "$settings_path/" 2> /dev/null && {
-			echo "Switched to $format (settings files)"
-		} || {
-			echo "Format $format does not have saved settings files."
-		}
 	} || {
 		echo "Error: format $format is missing card files"
 	}
+}
+
+#================================
+# Switch settings
+#================================
+
+switch_settings () {
+	local format="$1"
+	local sourcepath="$formats_path/$format"
+
+	if [ ! -d "$sourcepath" ]; then
+		echo "Error: format $format does not exist"
+		return
+	fi
+
+	cp -f "$sourcepath/$global_file" "$sourcepath/$downloads_file" "$sourcepath/$filter_file" "$settings_path/" 2> /dev/null && {
+		echo "Switched to $format (settings files)"
+	} || {
+		echo "Format $format does not have saved settings files."
+	} 
 }
 
 #================================
