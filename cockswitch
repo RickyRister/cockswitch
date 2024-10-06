@@ -41,12 +41,14 @@ TRICE_PATH="$HOME/Library/Application Support/Cockatrice/Cockatrice"
 FORMATS_PATH="$TRICE_PATH/formats"
 DECKLIST_PATH="$TRICE_PATH/decks"
 SETTINGS_PATH="$TRICE_PATH/settings"
-CARD_FILE='cards.xml'
-TOKEN_FILE='tokens.xml'
+
+CARDS_XML='cards.xml'
+TOKENS_XML='tokens.xml'
+GLOBAL_INI='global.ini'
+DOWNLOADS_INI='downloads.ini'
+FILTERS_INI='gamefilters.ini'
+
 NOTES_FILE='notes.txt'
-GLOBAL_FILE='global.ini'
-DOWNLOADS_FILE='downloads.ini'
-FILTER_FILE='gamefilters.ini'
 
 #================================
 # optargs
@@ -181,7 +183,7 @@ switch_cards () {
 		return
 	fi
 
-	cp -f "$sourcepath/$CARD_FILE" "$sourcepath/$TOKEN_FILE" ./ 2> /dev/null && {
+	cp -f "$sourcepath/$CARDS_XML" "$sourcepath/$TOKENS_XML" ./ 2> /dev/null && {
 		echo "Switched to $format (card files)"
 	} || {
 		echo "Error: format $format is missing card files"
@@ -201,7 +203,7 @@ switch_settings () {
 		return
 	fi
 
-	cp -f "$sourcepath/$GLOBAL_FILE" "$sourcepath/$DOWNLOADS_FILE" "$sourcepath/$FILTER_FILE" "$SETTINGS_PATH/" 2> /dev/null && {
+	cp -f "$sourcepath/$GLOBAL_INI" "$sourcepath/$DOWNLOADS_INI" "$sourcepath/$FILTERS_INI" "$SETTINGS_PATH/" 2> /dev/null && {
 		echo "Switched to $format (settings files)"
 	} || {
 		echo "Format $format does not have saved settings files."
@@ -221,7 +223,7 @@ store_cards () {
 		return
 	fi
 
-	cp -f "./$CARD_FILE" "./$TOKEN_FILE" "$destpath" &&
+	cp -f "./$CARDS_XML" "./$TOKENS_XML" "$destpath" &&
 	echo "Updated $format with current card files"
 }
 
@@ -238,7 +240,7 @@ store_settings () {
 		return
 	fi
 
-	cp -f "$SETTINGS_PATH/$GLOBAL_FILE" "$SETTINGS_PATH/$DOWNLOADS_FILE" "$SETTINGS_PATH/$FILTER_FILE" "$destpath" &&
+	cp -f "$SETTINGS_PATH/$GLOBAL_INI" "$SETTINGS_PATH/$DOWNLOADS_INI" "$SETTINGS_PATH/$FILTERS_INI" "$destpath" &&
 	echo "Updated $format with current settings files"
 }
 
