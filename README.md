@@ -54,3 +54,10 @@ If you're manually replacing the cards.xml and tokens.xml files inside your cock
 
 Or, you can just go inside the formats folder and directly replace the relevant files. Files for each format are saved to `formats/<FORMAT>` inside the Cockatrice app support folder.
 
+### Local Custom Card Images
+
+Cockswitch supports the switching of local custom card images, for formats that use local card images located in the `pics/CUSTOM` folder (instead of downloading images from an external source on-the-fly).
+
+Create a folder named `CUSTOM` inside the format's folder (located in `formats/<FORMAT>` inside the Cockatrice app support folder), then put all card image folders that you would put inside Cockatrice's `pics/CUSTOM` folder inside that `CUSTOM` folder.
+
+When you switch to that format, cockswitch will symlink all folders in `formats/<FORMAT>/CUSTOM` to Cockatrice's `pics/CUSTOM`. When you switch to another format, cockswitch will delete all those symlinks from `pics/CUSTOM`.
