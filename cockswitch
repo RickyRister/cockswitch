@@ -41,6 +41,7 @@ TRICE_PATH="$HOME/Library/Application Support/Cockatrice/Cockatrice"
 FORMATS_PATH="$TRICE_PATH/formats"
 DECKLIST_PATH="$TRICE_PATH/decks"
 SETTINGS_PATH="$TRICE_PATH/settings"
+CUSTOM_IMG_PATH="$TRICE_PATH/pics/CUSTOM"
 
 CARDS_XML='cards.xml'
 TOKENS_XML='tokens.xml'
@@ -49,6 +50,7 @@ DOWNLOADS_INI='downloads.ini'
 FILTERS_INI='gamefilters.ini'
 
 NOTES_FILE='notes.txt'
+MANAGED_IMG_FILE='cockswitch_managed.txt'
 
 #================================
 # optargs
@@ -185,9 +187,67 @@ switch_cards () {
 
 	cp -f "$sourcepath/$CARDS_XML" "$sourcepath/$TOKENS_XML" ./ 2> /dev/null && {
 		echo "Switched to $format (card files)"
+		switch_custom_images "$format"
 	} || {
 		echo "Error: format $format is missing card files"
 	}
+}
+
+switch_custom_images () {
+	remove_old_images && symlink_new_images "$1"
+}
+
+remove_old_images () {
+	# go to custom images folder
+	cd "$CUSTOM_IMG_PATH"
+
+	# check if old format had custom images
+	if [ ! -f "$MANAGED_IMG_FILE" ]; then
+		return 0
+	fi
+
+	# remove all folders in the tracking file
+	removed_folders=""
+	while read set; do
+    	rm -r "$set" && removed_folders+="$set "
+	done < "$MANAGED_IMG_FILE"
+
+	echo "Removed the following from custom images: $removed_folders"
+
+	# delete tracking file
+	rm "$MANAGED_IMG_FILE"
+}
+
+symlink_new_images() {
+	local format="$1"
+	local sourcepath="$FORMATS_PATH/$format"
+	local custom_image_path="$sourcepath/CUSTOM"
+
+	# check if format has custom images
+	if [ ! -d "$custom_image_path" ]; then
+		return 0
+	fi
+
+	# start writing tracking file
+	local tracking_file="$CUSTOM_IMG_PATH/$MANAGED_IMG_FILE"
+	touch "$tracking_file"
+
+	# symlink all directories in CUSTOM
+	for setfolder in "$custom_image_path"/*; do
+		if [ -d "$setfolder" ]; then
+			setname=$(basename "$setfolder")
+
+			ln -s "$setfolder" "$CUSTOM_IMG_PATH" 2> /dev/null && {
+				# only append setname to tracking file if it was successfully symlinked
+				echo "$setname" >> "$tracking_file"
+			} || {
+				echo "Failed to symlink custom images for $setname;"\
+				"does a folder with that name already exist in CUSTOM?"
+			}
+		fi
+	done
+
+	echo "Symlinked custom images for $format"
 }
 
 #================================
