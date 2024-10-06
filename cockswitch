@@ -34,19 +34,19 @@ full_usage_info () {
 #================================
 
 #Mac Default
-trice_path="$HOME/Library/Application Support/Cockatrice/Cockatrice"
+TRICE_PATH="$HOME/Library/Application Support/Cockatrice/Cockatrice"
 #Linux Default (At least on Debian-based systems, probably most others)
-#trice_path="$HOME/.local/share/Cockatrice/Cockatrice"
+#TRICE_PATH="$HOME/.local/share/Cockatrice/Cockatrice"
 
-formats_path="$trice_path/formats"
-decklist_path="$trice_path/decks"
-settings_path="$trice_path/settings"
-card_file='cards.xml'
-token_file='tokens.xml'
-notes_file='notes.txt'
-global_file='global.ini'
-downloads_file='downloads.ini'
-filter_file='gamefilters.ini'
+FORMATS_PATH="$TRICE_PATH/formats"
+DECKLIST_PATH="$TRICE_PATH/decks"
+SETTINGS_PATH="$TRICE_PATH/settings"
+CARD_FILE='cards.xml'
+TOKEN_FILE='tokens.xml'
+NOTES_FILE='notes.txt'
+GLOBAL_FILE='global.ini'
+DOWNLOADS_FILE='downloads.ini'
+FILTER_FILE='gamefilters.ini'
 
 #================================
 # optargs
@@ -138,7 +138,7 @@ process_optargs () {
   	fi
 
  	# go to cockatrice folder
- 	cd "$trice_path"
+ 	cd "$TRICE_PATH"
 
 	# run the appropriate command
  	if [ $do_new = 'true' ]; then make_format "${@}"; fi
@@ -159,7 +159,7 @@ process_optargs () {
 
 make_format () {
 	local format="$1"
-	local destpath="$formats_path/$format"
+	local destpath="$FORMATS_PATH/$format"
 
 	mkdir "$destpath" 2> /dev/null && { 
 		echo "Created format $format" 
@@ -174,14 +174,14 @@ make_format () {
 
 switch_cards () {
 	local format="$1"
-	local sourcepath="$formats_path/$format"
+	local sourcepath="$FORMATS_PATH/$format"
 
 	if [ ! -d "$sourcepath" ]; then
 		echo "Error: format $format does not exist"
 		return
 	fi
 
-	cp -f "$sourcepath/$card_file" "$sourcepath/$token_file" ./ 2> /dev/null && {
+	cp -f "$sourcepath/$CARD_FILE" "$sourcepath/$TOKEN_FILE" ./ 2> /dev/null && {
 		echo "Switched to $format (card files)"
 	} || {
 		echo "Error: format $format is missing card files"
@@ -194,14 +194,14 @@ switch_cards () {
 
 switch_settings () {
 	local format="$1"
-	local sourcepath="$formats_path/$format"
+	local sourcepath="$FORMATS_PATH/$format"
 
 	if [ ! -d "$sourcepath" ]; then
 		echo "Error: format $format does not exist"
 		return
 	fi
 
-	cp -f "$sourcepath/$global_file" "$sourcepath/$downloads_file" "$sourcepath/$filter_file" "$settings_path/" 2> /dev/null && {
+	cp -f "$sourcepath/$GLOBAL_FILE" "$sourcepath/$DOWNLOADS_FILE" "$sourcepath/$FILTER_FILE" "$SETTINGS_PATH/" 2> /dev/null && {
 		echo "Switched to $format (settings files)"
 	} || {
 		echo "Format $format does not have saved settings files."
@@ -214,14 +214,14 @@ switch_settings () {
 
 store_cards () {
 	local format="$1"
-	local destpath="$formats_path/$format"
+	local destpath="$FORMATS_PATH/$format"
 
 	if [ ! -d "$destpath" ]; then
 		echo "Error: format $format does not exist"
 		return
 	fi
 
-	cp -f "./$card_file" "./$token_file" "$destpath" &&
+	cp -f "./$CARD_FILE" "./$TOKEN_FILE" "$destpath" &&
 	echo "Updated $format with current card files"
 }
 
@@ -231,14 +231,14 @@ store_cards () {
 
 store_settings () {
 	local format="$1"
-	local destpath="$formats_path/$format"
+	local destpath="$FORMATS_PATH/$format"
 
 	if [ ! -d "$destpath" ]; then
 		echo "Error: format $format does not exist"
 		return
 	fi
 
-	cp -f "$settings_path/$global_file" "$settings_path/$downloads_file" "$settings_path/$filter_file" "$destpath" &&
+	cp -f "$SETTINGS_PATH/$GLOBAL_FILE" "$SETTINGS_PATH/$DOWNLOADS_FILE" "$SETTINGS_PATH/$FILTER_FILE" "$destpath" &&
 	echo "Updated $format with current settings files"
 }
 
@@ -248,14 +248,14 @@ store_settings () {
 
 write_format () {
 	local format="$1"
-	local destpath="$formats_path/$format"
+	local destpath="$FORMATS_PATH/$format"
 
 	if [ ! -d "$destpath" ]; then
 		echo "Error: format $format does not exist"
 		return
 	fi
 
-	"${EDITOR}" "$destpath/$notes_file" && {
+	"${EDITOR}" "$destpath/$NOTES_FILE" && {
 		echo "Edited notes for $format"
 	}
 }
@@ -266,14 +266,14 @@ write_format () {
 
 info_format () {
 	local format="$1"
-	local destpath="$formats_path/$format"
+	local destpath="$FORMATS_PATH/$format"
 
 	if [ ! -d "$destpath" ]; then
 		echo "Error: format $format does not exist"
 		return
 	fi
 
-	cat "$destpath/$notes_file" 2> /dev/null || {
+	cat "$destpath/$NOTES_FILE" 2> /dev/null || {
 		echo "Error: No notes found for $format. Write notes with -w"
 	}
 }
@@ -284,7 +284,7 @@ info_format () {
 
 open_format () {
 	local format="$1"
-	local destpath="$decklist_path/$format"
+	local destpath="$DECKLIST_PATH/$format"
 
 	if [ ! -d "$destpath" ]; then
 		echo "Decklist folder for $format does not exist; created new folder"
@@ -300,7 +300,7 @@ open_format () {
 
 delete_format () {
 	local format="$1"
-	local destpath="$formats_path/$format"
+	local destpath="$FORMATS_PATH/$format"
 
 	if [ ! -d "$destpath" ]; then
 		echo "Error: format $format does not exist"
@@ -316,7 +316,7 @@ delete_format () {
 #================================
 
 list_formats () {
-	ls "$formats_path"
+	ls "$FORMATS_PATH"
 }
 
 #================================
