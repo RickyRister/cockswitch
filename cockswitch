@@ -66,7 +66,7 @@ do_switch_cards=false
 do_switch_settings=false
 do_write=false
 do_info=false
-do_open=false 
+do_open_decklists=false 
 do_delete=false
 do_list=false
 
@@ -100,7 +100,7 @@ process_optargs () {
    	     		do_info=true 
    	     		require_args=true ;;
    	   		o)
-   	     		do_open=true 
+   	     		do_open_decklists=true 
    	     		require_args=true ;;
    	   		d)
    	     		do_delete=true
@@ -141,7 +141,7 @@ process_optargs () {
  	if $do_store_settings; then store_settings "${@}"; fi
  	if $do_write; then write_format "${@}"; fi
  	if $do_info; then info_format "${@}"; fi
- 	if $do_open; then open_format "${@}"; fi
+ 	if $do_open_decklists; then open_format_decklists "${@}"; fi
  	if $do_switch_cards; then switch_cards "${@}"; fi
  	if $do_switch_settings; then switch_settings "${@}"; fi
  	if $do_delete; then delete_format "${@}"; fi
@@ -335,7 +335,7 @@ info_format () {
 # Open format decklist folder
 #================================
 
-open_format () {
+open_format_decklists () {
 	local format="$1"
 	local destpath="$DECKLIST_PATH/$format"
 
