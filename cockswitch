@@ -173,7 +173,7 @@ switch_cards () {
 
 	if [ ! -d "$sourcepath" ]; then
 		echo "Error: format $format does not exist"
-		return
+		return 1
 	fi
 
 	cp -f "$sourcepath/$CARDS_XML" "$sourcepath/$TOKENS_XML" ./ 2> /dev/null && {
@@ -251,7 +251,7 @@ switch_settings () {
 
 	if [ ! -d "$sourcepath" ]; then
 		echo "Error: format $format does not exist"
-		return
+		return 1
 	fi
 
 	cp -f "$sourcepath/$GLOBAL_INI" "$sourcepath/$DOWNLOADS_INI" "$sourcepath/$FILTERS_INI" "$SETTINGS_PATH/" 2> /dev/null && {
@@ -271,7 +271,7 @@ store_cards () {
 
 	if [ ! -d "$destpath" ]; then
 		echo "Error: format $format does not exist"
-		return
+		return 1
 	fi
 
 	cp -f "./$CARDS_XML" "./$TOKENS_XML" "$destpath" &&
@@ -288,7 +288,7 @@ store_settings () {
 
 	if [ ! -d "$destpath" ]; then
 		echo "Error: format $format does not exist"
-		return
+		return 1
 	fi
 
 	cp -f "$SETTINGS_PATH/$GLOBAL_INI" "$SETTINGS_PATH/$DOWNLOADS_INI" "$SETTINGS_PATH/$FILTERS_INI" "$destpath" &&
@@ -305,7 +305,7 @@ write_format () {
 
 	if [ ! -d "$destpath" ]; then
 		echo "Error: format $format does not exist"
-		return
+		return 1
 	fi
 
 	"${EDITOR}" "$destpath/$NOTES_FILE" && {
@@ -323,7 +323,7 @@ info_format () {
 
 	if [ ! -d "$destpath" ]; then
 		echo "Error: format $format does not exist"
-		return
+		return 1
 	fi
 
 	cat "$destpath/$NOTES_FILE" 2> /dev/null || {
@@ -357,7 +357,7 @@ delete_format () {
 
 	if [ ! -d "$destpath" ]; then
 		echo "Error: format $format does not exist"
-		return
+		return 1
 	fi
 
 	rm -r "$destpath" &&
