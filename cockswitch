@@ -126,7 +126,7 @@ process_optargs () {
 
   	# validate args
   	local arg_count=1
-  	if [ $allow_no_args = 'true' ] && [ $require_args = 'false' ]; then
+  	if $allow_no_args && ! $require_args; then
   		arg_count=0
   	fi
 
@@ -136,7 +136,7 @@ process_optargs () {
  	fi
 
  	# determine if switching is needed
-	if [ $no_opts = 'true' ] ; then
+	if $no_opts; then
 		do_switch_cards=true
 		do_switch_settings=true
   	fi
@@ -145,16 +145,16 @@ process_optargs () {
  	cd "$TRICE_PATH"
 
 	# run the appropriate command
- 	if [ $do_new = 'true' ]; then make_format "${@}"; fi
- 	if [ $do_store_cards = 'true' ]; then store_cards "${@}"; fi
- 	if [ $do_store_settings = 'true' ]; then store_settings "${@}"; fi
- 	if [ $do_write = 'true' ]; then write_format "${@}"; fi
- 	if [ $do_info = 'true' ]; then info_format "${@}"; fi
- 	if [ $do_open = 'true' ]; then open_format "${@}"; fi
- 	if [ $do_switch_cards = 'true' ]; then switch_cards "${@}"; fi
- 	if [ $do_switch_settings = 'true' ]; then switch_settings "${@}"; fi
- 	if [ $do_delete = 'true' ]; then delete_format "${@}"; fi
- 	if [ $do_list = 'true' ]; then list_formats; fi
+ 	if $do_new; then make_format "${@}"; fi
+ 	if $do_store_cards; then store_cards "${@}"; fi
+ 	if $do_store_settings; then store_settings "${@}"; fi
+ 	if $do_write; then write_format "${@}"; fi
+ 	if $do_info; then info_format "${@}"; fi
+ 	if $do_open; then open_format "${@}"; fi
+ 	if $do_switch_cards; then switch_cards "${@}"; fi
+ 	if $do_switch_settings; then switch_settings "${@}"; fi
+ 	if $do_delete; then delete_format "${@}"; fi
+ 	if $do_list; then list_formats; fi
 }
 
 #================================
