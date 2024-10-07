@@ -125,12 +125,12 @@ process_optargs () {
   	shift $((OPTIND-1))
 
   	# validate args
-  	local arg_count=1
+  	local required_arg_count=1
   	if $allow_no_args && ! $require_args; then
-  		arg_count=0
+  		required_arg_count=0
   	fi
 
-  	if [ $# -ne $arg_count ]; then 
+  	if [ $# -ne $required_arg_count ]; then 
 		usage_info 
 		exit 1
  	fi
