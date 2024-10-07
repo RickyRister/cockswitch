@@ -25,6 +25,7 @@ full_usage_info () {
   	echo "-w	edit the format's notes"
   	echo "-p	print the format's notes"
   	echo "-o	open the decklist folder for that format"
+  	echo "-f	open the format folder for that format"
   	echo "-d	delete the format"
   	echo "-l	list all saved formats"
 }
@@ -67,12 +68,13 @@ do_switch_settings=false
 do_write=false
 do_info=false
 do_open_decklists=false 
+do_open_format=false 
 do_delete=false
 do_list=false
 
 process_optargs () {
   	local OPTIND
-  	while getopts "hnutcswpodl" option; do
+  	while getopts "hnutcswpofdl" option; do
   		no_opts=false
   	 	case $option in
    	   		h)
@@ -101,6 +103,9 @@ process_optargs () {
    	     		require_args=true ;;
    	   		o)
    	     		do_open_decklists=true 
+   	     		require_args=true ;;
+   	   		f)
+   	     		do_open_format=true 
    	     		require_args=true ;;
    	   		d)
    	     		do_delete=true
@@ -142,6 +147,7 @@ process_optargs () {
  	if $do_write; then write_format "${@}"; fi
  	if $do_info; then info_format "${@}"; fi
  	if $do_open_decklists; then open_format_decklists "${@}"; fi
+ 	if $do_open_format; then open_format_folder "${@}"; fi
  	if $do_switch_cards; then switch_cards "${@}"; fi
  	if $do_switch_settings; then switch_settings "${@}"; fi
  	if $do_delete; then delete_format "${@}"; fi
@@ -342,6 +348,22 @@ open_format_decklists () {
 	if [ ! -d "$destpath" ]; then
 		echo "Decklist folder for $format does not exist; created new folder"
 		mkdir "$destpath"
+	fi
+
+	open "$destpath"
+}
+
+#================================
+# Open format folder
+#================================
+
+open_format_folder () {
+	local format="$1"
+	local destpath="$FORMATS_PATH/$format"
+
+	if [ ! -d "$destpath" ]; then
+		echo "Error: format $format does not exist"
+		return 1
 	fi
 
 	open "$destpath"
