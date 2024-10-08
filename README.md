@@ -37,7 +37,7 @@ cockatrice	# Or you can just open the Cockatrice app normally
 (You could use the above two lines as a very tiny script to run cockswitch and cockatrice in a single command. I have these linked off my application menu for a seamless experience.)
 
 The tool will set: 
-* `-u`: Cards, tokens
+* `-u`: Cards, tokens, custom images
 * `-t`: Card image download locations, card and token update locations, filters on a server, default game creation settings. (It also grabs a couple of other things in global. This isn't likely to affect you, but if it does take a look in global.ini)
 
 ### Updating a format
