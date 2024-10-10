@@ -70,37 +70,45 @@ do_list=false
 process_optargs () {
   	local OPTIND
   	while getopts "hnutcsofdl" option; do
-  		no_opts=false
   	 	case $option in
    	   		h)
    	     		full_usage_info
    	     		exit 1 ;;
    	   		n)
    	     		do_new=true
+   	     		no_opts=false
    	     		require_args=true ;;
    	   		u)
    	     		do_store_cards=true
+   	     		no_opts=false
    	     		require_args=true ;;
    	     	t)
    	     		do_store_settings=true
+   	     		no_opts=false
    	     		require_args=true ;;
    	     	c)
    	     		do_switch_cards=true
+   	     		no_opts=false
    	     		require_args=true ;;
    	     	s)
    	     		do_switch_settings=true
+   	     		no_opts=false
    	     		require_args=true ;;
    	   		o)
    	     		do_open_decklists=true 
+   	     		no_opts=false
    	     		require_args=true ;;
    	   		f)
    	     		do_open_format=true 
+   	     		no_opts=false
    	     		require_args=true ;;
    	   		d)
    	     		do_delete=true
+   	     		no_opts=false
    	     		require_args=true ;;
    	   		l)
    	     		do_list=true 
+   	     		no_opts=false
    	     		allow_no_args=true ;;
    	  		\?)
    	     		exit 1 ;;
