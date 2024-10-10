@@ -26,6 +26,7 @@ full_usage_info () {
   	echo "-f	open the format folder for that format"
   	echo "-d	delete the format"
   	echo "-l	list all saved formats"
+  	echo "-w	for selecting which custom image workaround to use"
 }
 
 #================================
@@ -40,7 +41,8 @@ TRICE_PATH="$HOME/Library/Application Support/Cockatrice/Cockatrice"
 FORMATS_PATH="$TRICE_PATH/formats"
 DECKLIST_PATH="$TRICE_PATH/decks"
 SETTINGS_PATH="$TRICE_PATH/settings"
-CUSTOM_IMG_PATH="$TRICE_PATH/pics/CUSTOM"
+PICS_PATH="$TRICE_PATH/pics"
+CUSTOM_IMG_PATH="$PICS_PATH/CUSTOM"
 
 CARDS_XML='cards.xml'
 TOKENS_XML='tokens.xml'
@@ -66,10 +68,12 @@ do_open_decklists=false
 do_open_format=false 
 do_delete=false
 do_list=false
+# false = symlink dirs in pics; true = directly symlink images
+workaround_mode_directly_ln=false 
 
 process_optargs () {
   	local OPTIND
-  	while getopts "hnutcsofdl" option; do
+  	while getopts "hnutcsofdlw" option; do
   	 	case $option in
    	   		h)
    	     		full_usage_info
@@ -110,6 +114,8 @@ process_optargs () {
    	     		do_list=true 
    	     		no_opts=false
    	     		allow_no_args=true ;;
+   	     	w)
+				workaround_mode_directly_ln=true ;;
    	  		\?)
    	     		exit 1 ;;
    		esac
@@ -190,16 +196,23 @@ switch_custom_images () {
 }
 
 remove_old_images () {
-	# go to custom images folder
-	cd "$CUSTOM_IMG_PATH"
+	# we have to remove from both pics and pics/CUSTOM to account for both workaround options
+	delete_tracked_in_dir "$PICS_PATH" &&\
+	delete_tracked_in_dir "$CUSTOM_IMG_PATH"
+}
 
-	# check if old format had custom images
+# if target dir has a tracking file, then run the deletion
+delete_tracked_in_dir () {
+	# go to dir
+	cd "$1"
+
+	# check if the dir has a tracking file
 	if [ ! -f "$MANAGED_IMG_FILE" ]; then
 		return 0
 	fi
 
-	# remove all folders in the tracking file
-	removed_folders=""
+	# remove all folders listed in the tracking file
+	local removed_folders=""
 	while read set; do
     	rm -r "$set" && removed_folders+="$set "
 	done < "$MANAGED_IMG_FILE"
@@ -220,26 +233,53 @@ symlink_new_images() {
 		return 0
 	fi
 
-	# start writing tracking file
-	local tracking_file="$CUSTOM_IMG_PATH/$MANAGED_IMG_FILE"
-	touch "$tracking_file"
-
 	# symlink all directories in CUSTOM
 	for setfolder in "$custom_image_path"/*; do
 		if [ -d "$setfolder" ]; then
-			setname=$(basename "$setfolder")
+			local setname=$(basename "$setfolder")
 
-			ln -s "$setfolder" "$CUSTOM_IMG_PATH" 2> /dev/null && {
-				# only append setname to tracking file if it was successfully symlinked
-				echo "$setname" >> "$tracking_file"
+			{
+				if $workaround_mode_directly_ln; then
+					symlink_set_images_directly "$setfolder"
+				else
+					symlink_set_in_pics_dir "$setfolder"
+				fi
 			} || {
 				echo "Failed to symlink custom images for $setname;"\
-				"does a folder with that name already exist in CUSTOM?"
+				"does a folder with that name already exist in that location?"
 			}
 		fi
 	done
 
 	echo "Symlinked custom images for $format"
+}
+
+symlink_set_in_pics_dir () {
+	local setfolder="$1"
+	local setname=$(basename "$setfolder")
+
+	local tracking_file="$PICS_PATH/$MANAGED_IMG_FILE"
+
+	ln -s "$setfolder" "$PICS_PATH" 2> /dev/null && \
+	echo "$setname" >> "$tracking_file"
+}
+
+symlink_set_images_directly () {
+	local setfolder="$1"
+	local setname=$(basename "$setfolder")
+
+	mkdir "$CUSTOM_IMG_PATH/$setname" 2> /dev/null && {
+		# append setname to tracking file if folder for it was successfully created,
+		# even if image symlinking fails later on
+		local tracking_file="$CUSTOM_IMG_PATH/$MANAGED_IMG_FILE"
+		echo "$setname" >> "$tracking_file"
+
+		# symlink each image individually into that folder as workaround for cockatrice bug
+		for imagefile in "$setfolder"/*; do
+			# run it in parallel to speed things up
+			ln -s "$imagefile" "$CUSTOM_IMG_PATH/$setname" & 
+		done
+	}
 }
 
 #================================
