@@ -50,7 +50,7 @@ GLOBAL_INI='global.ini'
 DOWNLOADS_INI='downloads.ini'
 FILTERS_INI='gamefilters.ini'
 
-MANAGED_IMG_FILE='cockswitch_managed.txt'
+TRACKING_FILE='cockswitch_managed.txt'
 
 #================================
 # optargs
@@ -207,7 +207,7 @@ delete_tracked_in_dir () {
 	cd "$1"
 
 	# check if the dir has a tracking file
-	if [ ! -f "$MANAGED_IMG_FILE" ]; then
+	if [ ! -f "$TRACKING_FILE" ]; then
 		return 0
 	fi
 
@@ -215,12 +215,12 @@ delete_tracked_in_dir () {
 	local removed_folders=""
 	while read set; do
     	rm -r "$set" && removed_folders+="$set "
-	done < "$MANAGED_IMG_FILE"
+	done < "$TRACKING_FILE"
 
 	echo "Removed the following from custom images: $removed_folders"
 
 	# delete tracking file
-	rm "$MANAGED_IMG_FILE"
+	rm "$TRACKING_FILE"
 }
 
 symlink_new_images() {
@@ -258,7 +258,7 @@ symlink_set_in_pics_dir () {
 	local setfolder="$1"
 	local setname=$(basename "$setfolder")
 
-	local tracking_file="$PICS_PATH/$MANAGED_IMG_FILE"
+	local tracking_file="$PICS_PATH/$TRACKING_FILE"
 
 	ln -s "$setfolder" "$PICS_PATH" 2> /dev/null && \
 	echo "$setname" >> "$tracking_file"
@@ -271,7 +271,7 @@ symlink_set_images_directly () {
 	mkdir "$CUSTOM_IMG_PATH/$setname" 2> /dev/null && {
 		# append setname to tracking file if folder for it was successfully created,
 		# even if image symlinking fails later on
-		local tracking_file="$CUSTOM_IMG_PATH/$MANAGED_IMG_FILE"
+		local tracking_file="$CUSTOM_IMG_PATH/$TRACKING_FILE"
 		echo "$setname" >> "$tracking_file"
 
 		# symlink each image individually into that folder as workaround for cockatrice bug
