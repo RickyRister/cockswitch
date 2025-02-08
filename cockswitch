@@ -26,7 +26,7 @@ full_usage_info () {
   	echo "-f	open the format folder for that format"
   	echo "-d	delete the format"
   	echo "-l	list all saved formats"
-  	echo "-w	for selecting which custom image workaround to use"
+  	echo "-w	use the workaround for custom image folder symlink bug"
 }
 
 #================================
@@ -68,8 +68,7 @@ do_open_decklists=false
 do_open_format=false 
 do_delete=false
 do_list=false
-# false = symlink dirs in pics; true = directly symlink images
-workaround_mode_directly_ln=false 
+do_workaround=false 
 
 process_optargs () {
   	local OPTIND
@@ -115,7 +114,7 @@ process_optargs () {
    	     		no_opts=false
    	     		allow_no_args=true ;;
    	     	w)
-				workaround_mode_directly_ln=true ;;
+				do_workaround=true ;;
    	  		\?)
    	     		exit 1 ;;
    		esac
@@ -239,14 +238,14 @@ symlink_new_images() {
 			local setname=$(basename "$setfolder")
 
 			{
-				if $workaround_mode_directly_ln; then
-					symlink_set_images_directly "$setfolder"
-				else
+				if $do_workaround; then
 					symlink_set_in_pics_dir "$setfolder"
+				else
+					symlink_normal "$setfolder"
 				fi
 			} || {
 				echo "Failed to symlink custom images for $setname;"\
-				"does a folder with that name already exist in that location?"
+				"does a folder with that name already exist in CUSTOM?"
 			}
 		fi
 	done
@@ -254,6 +253,7 @@ symlink_new_images() {
 	echo "Symlinked custom images for $format"
 }
 
+# workaround for symlink bug in Cockatrice 2.9
 symlink_set_in_pics_dir () {
 	local setfolder="$1"
 	local setname=$(basename "$setfolder")
@@ -264,22 +264,16 @@ symlink_set_in_pics_dir () {
 	echo "$setname" >> "$tracking_file"
 }
 
-symlink_set_images_directly () {
-	local setfolder="$1"
+symlink_normal () {
 	local setname=$(basename "$setfolder")
 
-	mkdir "$CUSTOM_IMG_PATH/$setname" 2> /dev/null && {
-		# append setname to tracking file if folder for it was successfully created,
-		# even if image symlinking fails later on
-		local tracking_file="$CUSTOM_IMG_PATH/$TRACKING_FILE"
-		echo "$setname" >> "$tracking_file"
+	# start writing tracking file
+	local tracking_file="$CUSTOM_IMG_PATH/$TRACKING_FILE"
+	touch "$tracking_file"
 
-		# symlink each image individually into that folder as workaround for cockatrice bug
-		for imagefile in "$setfolder"/*; do
-			# run it in parallel to speed things up
-			ln -s "$imagefile" "$CUSTOM_IMG_PATH/$setname" & 
-		done
-	}
+	ln -s "$setfolder" "$CUSTOM_IMG_PATH" 2> /dev/null && \
+	# only append setname to tracking file if it was successfully symlinked
+	echo "$setname" >> "$tracking_file"
 }
 
 #================================

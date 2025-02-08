@@ -71,25 +71,14 @@ Cockswitch supports the switching of local custom card images, for formats that 
 Create a folder named `CUSTOM` inside the format's folder (located in `formats/<FORMAT>` inside the Cockatrice app support folder),
 then put all card image folders that you would put inside Cockatrice's `pics/CUSTOM` folder inside that `CUSTOM` folder.
 
-~~When you switch to that format, cockswitch will symlink all folders in `formats/<FORMAT>/CUSTOM` to Cockatrice's `pics/CUSTOM`.
-When you switch to another format, cockswitch will delete all those symlinks from `pics/CUSTOM`.~~
+When you switch to that format, cockswitch will symlink all folders in `formats/<FORMAT>/CUSTOM` to Cockatrice's `pics/CUSTOM`.
+When you switch to another format, cockswitch will delete all those symlinks from `pics/CUSTOM`.
 
-> **NOTE:** Currently, Cockatrice has a bug where it doesn't traverse symlinked directories when looking for card images in the custom image folder.
+> **NOTE:** Cockatrice <= 2.9 has a bug where it doesn't traverse symlinked directories when looking for card images in the custom image folder. Use the `-w` flag to enable the workaround.
 >
-> Cockswitch offers two workarounds for this problem. Use the `-w` flag to select which one to use.
->
-> #### (without `-w`) Symlink folders in `pics`
+> #### `-w`: Symlink folders in `pics`
 >
 > Instead of creating the symlinks inside `pics/CUSTOM`, cockswitch will create the symlinks in `pics`.
 >
 > Cockatrice will still be able to find the card image **as long as** the name of the folder the image is located in matches the set code of the card.
->
-> #### (with `-w`) Symlink images directly
->
-> Instead of symlinking the directories, cockswitch will create actual directories in `pics/CUSTOM`, 
-> then individually symlink each card image inside the directory.
-> (The directories are still deleted as normal when switching away from a format)
-> 
-> Cockswitch may freeze for a bit if you switch to a format that has a lot of custom images.
-> This also means cockswitch will not work with more than one level of nesting inside the CUSTOM folder.
 
