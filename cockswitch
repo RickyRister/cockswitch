@@ -182,9 +182,15 @@ switch_cards () {
 		return 1
 	fi
 
-	cp -f "$sourcepath/$CARDS_XML" "$sourcepath/$TOKENS_XML" ./ 2> /dev/null && {
+	cp -f "$sourcepath/$CARDS_XML" "$sourcepath/$TOKENS_XML" ./ 2> /dev/null &&
+	{
 		echo "Switched to $format (card files)"
 		switch_custom_images "$format"
+
+		cp -f "$sourcepath/$DOWNLOADS_INI" "$SETTINGS_PATH/" 2> /dev/null &&
+		{
+			echo "Switched to $format (download urls)"
+		}
 	} || {
 		echo "Error: format $format is missing card files"
 	}
@@ -289,7 +295,7 @@ switch_settings () {
 		return 1
 	fi
 
-	cp -f "$sourcepath/$GLOBAL_INI" "$sourcepath/$DOWNLOADS_INI" "$sourcepath/$FILTERS_INI" "$SETTINGS_PATH/" 2> /dev/null && {
+	cp -f "$sourcepath/$GLOBAL_INI" "$sourcepath/$FILTERS_INI" "$SETTINGS_PATH/" 2> /dev/null && {
 		echo "Switched to $format (settings files)"
 	} || {
 		echo "Format $format does not have saved settings files."
@@ -309,7 +315,7 @@ store_cards () {
 		return 1
 	fi
 
-	cp -f "./$CARDS_XML" "./$TOKENS_XML" "$destpath" &&
+	cp -f "./$CARDS_XML" "./$TOKENS_XML" "$SETTINGS_PATH/$DOWNLOADS_INI" "$destpath" &&
 	echo "Updated $format with current card files"
 }
 
@@ -326,7 +332,7 @@ store_settings () {
 		return 1
 	fi
 
-	cp -f "$SETTINGS_PATH/$GLOBAL_INI" "$SETTINGS_PATH/$DOWNLOADS_INI" "$SETTINGS_PATH/$FILTERS_INI" "$destpath" &&
+	cp -f "$SETTINGS_PATH/$GLOBAL_INI" "$SETTINGS_PATH/$FILTERS_INI" "$destpath" &&
 	echo "Updated $format with current settings files"
 }
 
