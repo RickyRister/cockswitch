@@ -45,7 +45,7 @@ CUSTOM_IMG_PATH="$PICS_PATH/CUSTOM"
 
 CARDS_XML='cards.xml'
 TOKENS_XML='tokens.xml'
-GLOBAL_INI='global.ini'
+ORACLE_INI='oracle.ini'
 DOWNLOADS_INI='downloads.ini'
 FILTERS_INI='gamefilters.ini'
 
@@ -273,7 +273,7 @@ switch_settings () {
 		return 1
 	fi
 
-	cp -f "$sourcepath/$GLOBAL_INI" "$sourcepath/$FILTERS_INI" "$SETTINGS_PATH/" 2> /dev/null && {
+	cp -f "$sourcepath/$ORACLE_INI" "$sourcepath/$FILTERS_INI" "$SETTINGS_PATH/" 2> /dev/null && {
 		echo "Switched to $format (settings files)"
 	} || {
 		echo "Format $format does not have saved settings files."
@@ -310,7 +310,7 @@ store_settings () {
 		return 1
 	fi
 
-	cp -f "$SETTINGS_PATH/$GLOBAL_INI" "$SETTINGS_PATH/$FILTERS_INI" "$destpath" &&
+	cp -f "$SETTINGS_PATH/$ORACLE_INI" "$SETTINGS_PATH/$FILTERS_INI" "$destpath" &&
 	echo "Updated $format with current settings files"
 }
 

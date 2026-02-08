@@ -41,14 +41,17 @@ I have these linked off my application menu for a seamless experience.)
 
 The tool will set: 
 * `-u`: Cards, tokens, custom images, card image urls
-* `-t`: Card and token update locations, filters on a server, default game creation settings. 
-  (It also grabs a couple of other things in global. This isn't likely to affect you, but if it does take a look in `global.ini`)
+* `-t`: Oracle download links, filters on a server, default game creation settings.
+
+Note: The current version of cockswitch only fully supports Cockatrice `3.0` and above. 
+In previous Cockatrice versions, the oracle download links were stored in `global.ini` instead of `oracle.ini`.
+However, everything else should still work.
 
 ### Updating a format
 
 #### Oracle
 
-Oracle stores your most recent download url in `global.ini`, so if you stored the settings files correctly, 
+Oracle stores your most recent download url in `oracle.ini`, so if you stored the settings files correctly, 
 all you have to do is switch over to the format and run Oracle; the correct download urls will already be filled in for you! 
 Don't forget to `cockswitch -u` afterwards.
 
