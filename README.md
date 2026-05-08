@@ -42,13 +42,13 @@ I have these linked off my application menu for a seamless experience.)
 The tool will set: 
 * `-u`: Cards, tokens, custom images, card image urls
 * `-t`: Card and token update locations, filters on a server, default game creation settings. 
-  (It also grabs a couple of other things in global. This isn't likely to affect you, but if it does take a look in global.ini)
+  (It also grabs a couple of other things in global. This isn't likely to affect you, but if it does take a look in `global.ini`)
 
 ### Updating a format
 
 #### Oracle
 
-Oracle stores your most recent download url in global.ini, so if you stored the settings files correctly, 
+Oracle stores your most recent download url in `global.ini`, so if you stored the settings files correctly, 
 all you have to do is switch over to the format and run Oracle; the correct download urls will already be filled in for you! 
 Don't forget to `cockswitch -u` afterwards.
 
@@ -57,7 +57,7 @@ You can `cockswitch -t` afterwards to save the settings files (which should cont
 
 #### Manual
 
-If you're manually replacing the cards.xml and tokens.xml files inside your cockatrice folder, then you can keep doing that. 
+If you're manually replacing the `cards.xml` and `tokens.xml` files inside your cockatrice folder, then you can keep doing that. 
 Just remember to `cockswitch -u` afterwards.
 
 Or, you can just go inside the formats folder and directly replace the relevant files. 
