@@ -40,8 +40,8 @@ cockatrice	# Or you can just open the Cockatrice app normally
 I have these linked off my application menu for a seamless experience.)
 
 The tool will set: 
-* `-u`: Cards, tokens, custom images
-* `-t`: Card image download locations, card and token update locations, filters on a server, default game creation settings. 
+* `-u`: Cards, tokens, custom images, card image urls
+* `-t`: Card and token update locations, filters on a server, default game creation settings. 
   (It also grabs a couple of other things in global. This isn't likely to affect you, but if it does take a look in global.ini)
 
 ### Updating a format
@@ -76,7 +76,7 @@ When you switch to another format, cockswitch will delete all those symlinks fro
 
 > **NOTE:** Cockatrice <= 2.9 has a bug where it doesn't traverse symlinked directories when looking for card images in the custom image folder. Use the `-w` flag to enable the workaround.
 >
-> #### `-w`: Symlink folders in `pics`
+> #### `-w`: Use the workaround for custom image folder symlink bug
 >
 > Instead of creating the symlinks inside `pics/CUSTOM`, cockswitch will create the symlinks in `pics`.
 >
