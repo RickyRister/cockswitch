@@ -165,7 +165,7 @@ make_format () {
 	mkdir "$destpath" 2> /dev/null && { 
 		echo "Created format $format" 
 	} || {
-		echo "Error: format $format already exists"
+		echo "Error: failed to create format $format. Does it already exist?"
 	}
 }
 
