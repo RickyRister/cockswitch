@@ -162,7 +162,7 @@ make_format () {
 	local format="$1"
 	local destpath="$FORMATS_PATH/$format"
 
-	mkdir "$destpath" 2> /dev/null && { 
+	mkdir -p "$destpath" 2> /dev/null && { 
 		echo "Created format $format" 
 	} || {
 		echo "Error: failed to create format $format. Does it already exist?"
@@ -346,7 +346,7 @@ open_format_decklists () {
 
 	if [ ! -d "$destpath" ]; then
 		echo "Decklist folder for $format does not exist; created new folder"
-		mkdir "$destpath"
+		mkdir -p "$destpath"
 	fi
 
 	open "$destpath"
