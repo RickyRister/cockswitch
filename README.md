@@ -73,12 +73,3 @@ then put all card image folders that you would put inside Cockatrice's `pics/CUS
 
 When you switch to that format, cockswitch will symlink all folders in `formats/<FORMAT>/CUSTOM` to Cockatrice's `pics/CUSTOM`.
 When you switch to another format, cockswitch will delete all those symlinks from `pics/CUSTOM`.
-
-> **NOTE:** Cockatrice <= 2.9 has a bug where it doesn't traverse symlinked directories when looking for card images in the custom image folder. Use the `-w` flag to enable the workaround.
->
-> #### `-w`: Use the workaround for custom image folder symlink bug
->
-> Instead of creating the symlinks inside `pics/CUSTOM`, cockswitch will create the symlinks in `pics`.
->
-> Cockatrice will still be able to find the card image **as long as** the name of the folder the image is located in matches the set code of the card.
-
